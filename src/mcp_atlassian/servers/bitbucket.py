@@ -379,3 +379,34 @@ async def get_build_status(
     bitbucket = await get_bitbucket_fetcher(ctx)
     build_status = bitbucket.get_build_status(commit_id=commit_id)
     return json.dumps(build_status, indent=2)
+
+
+@bitbucket_mcp.tool(
+    tags={"bitbucket", "read", "toolset:bitbucket_search"},
+    annotations={"title": "Get Projects", "readOnlyHint": True},
+)
+async def get_projects(
+    ctx: Context,
+    start: Annotated[int, Field(description="Starting index for pagination")] = 0,
+    limit: Annotated[int, Field(description="Maximum number of projects to return")] = 25,
+) -> str:
+    """List all Bitbucket Server projects."""
+    bitbucket = await get_bitbucket_fetcher(ctx)
+    projects = bitbucket.get_projects(start=start, limit=limit)
+    return json.dumps(projects, indent=2)
+
+
+@bitbucket_mcp.tool(
+    tags={"bitbucket", "read", "toolset:bitbucket_search"},
+    annotations={"title": "Get Repositories", "readOnlyHint": True},
+)
+async def get_repositories(
+    ctx: Context,
+    project_key: Annotated[str, Field(description="Project key")],
+    start: Annotated[int, Field(description="Starting index for pagination")] = 0,
+    limit: Annotated[int, Field(description="Maximum number of repos to return")] = 25,
+) -> str:
+    """List repositories in a Bitbucket Server project."""
+    bitbucket = await get_bitbucket_fetcher(ctx)
+    repos = bitbucket.get_repositories(project_key=project_key, start=start, limit=limit)
+    return json.dumps(repos, indent=2)
