@@ -20,6 +20,40 @@ class BitbucketServerComments:
         """
         self.client = client
 
+    def get_comments(
+        self,
+        repository: str,
+        pr_id: int,
+        project: str | None = None,
+        start: int = 0,
+        limit: int = 25,
+    ) -> list[dict[str, object]]:
+        """Get comments on a pull request.
+
+        Args:
+            repository: Repository slug
+            pr_id: Pull request ID
+            project: Project key (can be omitted if provided in config)
+            start: Starting index for pagination
+            limit: Maximum number of results
+
+        Returns:
+            List of comment details
+        """
+        project = project or self._resolve_project()
+
+        logger.debug(f"Getting comments for PR {pr_id} in {project}/{repository}")
+
+        params: dict[str, object] = {"start": start, "limit": limit}
+        path = f"/projects/{project}/repos/{repository}/pull-requests/{pr_id}/comments"
+        response = self.client.get(path, params)
+
+        values = response.get("values", [])
+        return [
+            BitbucketServerComment.from_api_response(c).to_simplified_dict()
+            for c in values
+        ]
+
     def add_comment(
         self,
         repository: str,

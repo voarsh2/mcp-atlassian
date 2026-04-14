@@ -20,6 +20,40 @@ bitbucket_mcp = FastMCP(
 
 @bitbucket_mcp.tool(
     tags={"bitbucket", "read", "toolset:bitbucket_pull_requests"},
+    annotations={"title": "List Pull Requests", "readOnlyHint": True},
+)
+async def list_pull_requests(
+    ctx: Context,
+    repository: Annotated[
+        str, Field(description="Repository slug (e.g., 'my-repo')")
+    ],
+    project: Annotated[
+        str | None,
+        Field(description="Project key (optional if BITBUCKET_PROJECTS_FILTER set)"),
+    ] = None,
+    state: Annotated[
+        str | None,
+        Field(description="Filter by state (OPEN, MERGED, DECLINED)"),
+    ] = None,
+    start: Annotated[int, Field(description="Starting index for pagination")] = 0,
+    limit: Annotated[
+        int, Field(description="Maximum number of PRs to return")
+    ] = 25,
+) -> str:
+    """List pull requests in a repository."""
+    bitbucket = await get_bitbucket_fetcher(ctx)
+    prs = bitbucket.list_pull_requests(
+        repository=repository,
+        project=project,
+        state=state,
+        start=start,
+        limit=limit,
+    )
+    return json.dumps(prs, indent=2)
+
+
+@bitbucket_mcp.tool(
+    tags={"bitbucket", "read", "toolset:bitbucket_pull_requests"},
     annotations={"title": "Get Pull Request", "readOnlyHint": True},
 )
 async def get_pull_request(
@@ -39,6 +73,37 @@ async def get_pull_request(
         repository=repository, pr_id=pr_id, project=project
     )
     return json.dumps(pr.to_simplified_dict(), indent=2)
+
+
+@bitbucket_mcp.tool(
+    tags={"bitbucket", "read", "toolset:bitbucket_pull_requests"},
+    annotations={"title": "Get Pull Request Comments", "readOnlyHint": True},
+)
+async def get_comments(
+    ctx: Context,
+    repository: Annotated[
+        str, Field(description="Repository slug (e.g., 'my-repo')")
+    ],
+    pr_id: Annotated[int, Field(description="Pull request ID")],
+    project: Annotated[
+        str | None,
+        Field(description="Project key (optional if BITBUCKET_PROJECTS_FILTER set)"),
+    ] = None,
+    start: Annotated[int, Field(description="Starting index for pagination")] = 0,
+    limit: Annotated[
+        int, Field(description="Maximum number of comments to return")
+    ] = 25,
+) -> str:
+    """Get comments on a pull request."""
+    bitbucket = await get_bitbucket_fetcher(ctx)
+    comments = bitbucket.get_comments(
+        repository=repository,
+        pr_id=pr_id,
+        project=project,
+        start=start,
+        limit=limit,
+    )
+    return json.dumps(comments, indent=2)
 
 
 @bitbucket_mcp.tool(
@@ -388,7 +453,9 @@ async def get_build_status(
 async def get_projects(
     ctx: Context,
     start: Annotated[int, Field(description="Starting index for pagination")] = 0,
-    limit: Annotated[int, Field(description="Maximum number of projects to return")] = 25,
+    limit: Annotated[
+        int, Field(description="Maximum number of projects to return")
+    ] = 25,
 ) -> str:
     """List all Bitbucket Server projects."""
     bitbucket = await get_bitbucket_fetcher(ctx)
@@ -408,7 +475,9 @@ async def get_repositories(
 ) -> str:
     """List repositories in a Bitbucket Server project."""
     bitbucket = await get_bitbucket_fetcher(ctx)
-    repos = bitbucket.get_repositories(project_key=project_key, start=start, limit=limit)
+    repos = bitbucket.get_repositories(
+        project_key=project_key, start=start, limit=limit
+    )
     return json.dumps(repos, indent=2)
 
 
