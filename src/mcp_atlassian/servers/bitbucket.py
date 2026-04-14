@@ -22,7 +22,7 @@ bitbucket_mcp = FastMCP(
     tags={"bitbucket", "read", "toolset:bitbucket_pull_requests"},
     annotations={"title": "Get Pull Request", "readOnlyHint": True},
 )
-async def bitbucket_get_pull_request(
+async def get_pull_request(
     ctx: Context,
     repository: Annotated[
         str, Field(description="Repository slug (e.g., 'my-repo')")
@@ -46,7 +46,7 @@ async def bitbucket_get_pull_request(
     annotations={"title": "Add Pull Request Comment", "readOnlyHint": False},
 )
 @check_write_access
-async def bitbucket_add_comment(
+async def add_comment(
     ctx: Context,
     repository: Annotated[
         str, Field(description="Repository slug (e.g., 'my-repo')")
@@ -77,7 +77,7 @@ async def bitbucket_add_comment(
     tags={"bitbucket", "read", "toolset:bitbucket_pull_requests"},
     annotations={"title": "Get Pull Request Diff", "readOnlyHint": True},
 )
-async def bitbucket_get_diff(
+async def get_diff(
     ctx: Context,
     repository: Annotated[
         str, Field(description="Repository slug (e.g., 'my-repo')")
@@ -115,7 +115,7 @@ async def bitbucket_get_diff(
     tags={"bitbucket", "read", "toolset:bitbucket_pull_requests"},
     annotations={"title": "Get Pull Request Reviews", "readOnlyHint": True},
 )
-async def bitbucket_get_reviews(
+async def get_reviews(
     ctx: Context,
     repository: Annotated[
         str, Field(description="Repository slug (e.g., 'my-repo')")
@@ -146,7 +146,7 @@ async def bitbucket_get_reviews(
     tags={"bitbucket", "read", "toolset:bitbucket_pull_requests"},
     annotations={"title": "Get Pull Request Activities", "readOnlyHint": True},
 )
-async def bitbucket_get_activities(
+async def get_activities(
     ctx: Context,
     repository: Annotated[
         str, Field(description="Repository slug (e.g., 'my-repo')")
@@ -177,7 +177,7 @@ async def bitbucket_get_activities(
     tags={"bitbucket", "read", "toolset:bitbucket_search"},
     annotations={"title": "Search Code", "readOnlyHint": True},
 )
-async def bitbucket_search_code(
+async def search_code(
     ctx: Context,
     query: Annotated[str, Field(description="The search query")],
     project_key: Annotated[
@@ -205,7 +205,7 @@ async def bitbucket_search_code(
     tags={"bitbucket", "read", "toolset:bitbucket_search"},
     annotations={"title": "Search Repositories", "readOnlyHint": True},
 )
-async def bitbucket_search_repositories(
+async def search_repositories(
     ctx: Context,
     query: Annotated[str, Field(description="The search query")],
     project_key: Annotated[
@@ -229,7 +229,7 @@ async def bitbucket_search_repositories(
     tags={"bitbucket", "read", "toolset:bitbucket_files"},
     annotations={"title": "Get File Content", "readOnlyHint": True},
 )
-async def bitbucket_get_file_content(
+async def get_file_content(
     ctx: Context,
     repository: Annotated[
         str, Field(description="Repository slug (e.g., 'my-repo')")
@@ -261,7 +261,7 @@ async def bitbucket_get_file_content(
     tags={"bitbucket", "read", "toolset:bitbucket_branches"},
     annotations={"title": "Get Branches", "readOnlyHint": True},
 )
-async def bitbucket_get_branches(
+async def get_branches(
     ctx: Context,
     repository: Annotated[
         str, Field(description="Repository slug (e.g., 'my-repo')")
@@ -294,7 +294,7 @@ async def bitbucket_get_branches(
     tags={"bitbucket", "read", "toolset:bitbucket_branches"},
     annotations={"title": "Get Branch Commits", "readOnlyHint": True},
 )
-async def bitbucket_get_branch_commits(
+async def get_branch_commits(
     ctx: Context,
     repository: Annotated[
         str, Field(description="Repository slug (e.g., 'my-repo')")
@@ -325,7 +325,7 @@ async def bitbucket_get_branch_commits(
     tags={"bitbucket", "read", "toolset:bitbucket_commits"},
     annotations={"title": "Get Commit", "readOnlyHint": True},
 )
-async def bitbucket_get_commit(
+async def get_commit(
     ctx: Context,
     repository: Annotated[
         str, Field(description="Repository slug (e.g., 'my-repo')")
@@ -348,7 +348,7 @@ async def bitbucket_get_commit(
     tags={"bitbucket", "read", "toolset:bitbucket_commits"},
     annotations={"title": "Get Commit Changes", "readOnlyHint": True},
 )
-async def bitbucket_get_commit_changes(
+async def get_commit_changes(
     ctx: Context,
     repository: Annotated[
         str, Field(description="Repository slug (e.g., 'my-repo')")
@@ -371,7 +371,7 @@ async def bitbucket_get_commit_changes(
     tags={"bitbucket", "read", "toolset:bitbucket_builds"},
     annotations={"title": "Get Build Status", "readOnlyHint": True},
 )
-async def bitbucket_get_build_status(
+async def get_build_status(
     ctx: Context,
     commit_id: Annotated[str, Field(description="Commit ID (SHA)")],
 ) -> str:
