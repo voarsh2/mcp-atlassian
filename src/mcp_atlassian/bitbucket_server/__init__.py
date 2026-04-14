@@ -243,6 +243,31 @@ class BitbucketServerFetcher:
             {"start": start, "limit": limit},
         )
 
+    def get_personal_project(
+        self,
+    ) -> dict[str, Any]:
+        """Get the authenticated user's personal project."""
+        username = self.config.username
+        if not username:
+            msg = "Username not configured — cannot fetch personal project"
+            raise ValueError(msg)
+        return self.client.get(f"/projects/~{username}")
+
+    def get_personal_repos(
+        self,
+        start: int = 0,
+        limit: int = 25,
+    ) -> dict[str, Any]:
+        """List repositories in the authenticated user's personal project."""
+        username = self.config.username
+        if not username:
+            msg = "Username not configured — cannot fetch personal repos"
+            raise ValueError(msg)
+        return self.client.get(
+            f"/projects/~{username}/repos",
+            {"start": start, "limit": limit},
+        )
+
     def close(self) -> None:
         """Close the client connection."""
         self.client.close()

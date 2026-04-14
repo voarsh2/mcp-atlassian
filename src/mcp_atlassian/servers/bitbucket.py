@@ -410,3 +410,31 @@ async def get_repositories(
     bitbucket = await get_bitbucket_fetcher(ctx)
     repos = bitbucket.get_repositories(project_key=project_key, start=start, limit=limit)
     return json.dumps(repos, indent=2)
+
+
+@bitbucket_mcp.tool(
+    tags={"bitbucket", "read", "toolset:bitbucket_search"},
+    annotations={"title": "Get Personal Project", "readOnlyHint": True},
+)
+async def get_personal_project(
+    ctx: Context,
+) -> str:
+    """Get the authenticated user's personal project."""
+    bitbucket = await get_bitbucket_fetcher(ctx)
+    project = bitbucket.get_personal_project()
+    return json.dumps(project, indent=2)
+
+
+@bitbucket_mcp.tool(
+    tags={"bitbucket", "read", "toolset:bitbucket_search"},
+    annotations={"title": "Get Personal Repositories", "readOnlyHint": True},
+)
+async def get_personal_repos(
+    ctx: Context,
+    start: Annotated[int, Field(description="Starting index for pagination")] = 0,
+    limit: Annotated[int, Field(description="Maximum number of repos to return")] = 25,
+) -> str:
+    """List repositories in the authenticated user's personal project."""
+    bitbucket = await get_bitbucket_fetcher(ctx)
+    repos = bitbucket.get_personal_repos(start=start, limit=limit)
+    return json.dumps(repos, indent=2)
