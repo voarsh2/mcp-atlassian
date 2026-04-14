@@ -33,8 +33,11 @@ dependencies = [
     "tzdata>=2024.1; platform_system=='Windows'",
 ]
 [[project.authors]]
-name = "sooperset"
-email = "soomiles.dev@gmail.com"
+name = "voarsh"
+
+[project.urls]
+Homepage = "https://github.com/voarsh2/mcp-atlassian"
+Repository = "https://github.com/voarsh2/mcp-atlassian"
 
 [build-system]
 requires = ["hatchling", "uv-dynamic-versioning>=0.7.0"]
