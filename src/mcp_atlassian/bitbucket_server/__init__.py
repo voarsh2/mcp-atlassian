@@ -43,12 +43,46 @@ class BitbucketServerFetcher:
         self.builds = BitbucketServerBuilds(self.client)
         self.commits = BitbucketServerCommits(self.client)
 
+    def list_pull_requests(
+        self,
+        repository: str,
+        project: str | None = None,
+        state: str | None = None,
+        start: int = 0,
+        limit: int = 25,
+    ) -> list[dict[str, object]]:
+        """List pull requests in a repository."""
+        return self.pull_requests.list_pull_requests(
+            repository=repository,
+            project=project,
+            state=state,
+            start=start,
+            limit=limit,
+        )
+
     def get_pull_request(
         self, repository: str, pr_id: int, project: str | None = None
     ) -> BitbucketServerPullRequest:
         """Get details of a pull request."""
         return self.pull_requests.get_pull_request(
             repository=repository, pr_id=pr_id, project=project
+        )
+
+    def get_comments(
+        self,
+        repository: str,
+        pr_id: int,
+        project: str | None = None,
+        start: int = 0,
+        limit: int = 25,
+    ) -> list[dict[str, object]]:
+        """Get comments on a pull request."""
+        return self.comments.get_comments(
+            repository=repository,
+            pr_id=pr_id,
+            project=project,
+            start=start,
+            limit=limit,
         )
 
     def add_comment(

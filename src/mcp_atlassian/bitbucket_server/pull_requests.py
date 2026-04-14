@@ -19,6 +19,43 @@ class BitbucketServerPullRequests:
         """
         self.client = client
 
+    def list_pull_requests(
+        self,
+        repository: str,
+        project: str | None = None,
+        state: str | None = None,
+        start: int = 0,
+        limit: int = 25,
+    ) -> list[dict[str, object]]:
+        """List pull requests in a repository.
+
+        Args:
+            repository: Repository slug
+            project: Project key (can be omitted if provided in config)
+            state: Filter by state (OPEN, MERGED, DECLINED)
+            start: Starting index for pagination
+            limit: Maximum number of results
+
+        Returns:
+            List of pull request details
+        """
+        project = project or self._resolve_project()
+
+        logger.debug(f"Listing pull requests in {project}/{repository}")
+
+        params: dict[str, object] = {"start": start, "limit": limit}
+        if state:
+            params["state"] = state
+
+        path = f"/projects/{project}/repos/{repository}/pull-requests"
+        response = self.client.get(path, params)
+
+        values = response.get("values", [])
+        return [
+            BitbucketServerPullRequest.from_api_response(pr).to_simplified_dict()
+            for pr in values
+        ]
+
     def get_pull_request(
         self, repository: str, pr_id: int, project: str | None = None
     ) -> BitbucketServerPullRequest:
