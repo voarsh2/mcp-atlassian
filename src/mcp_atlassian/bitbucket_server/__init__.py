@@ -223,6 +223,26 @@ class BitbucketServerFetcher:
         """Get build status for a commit."""
         return self.builds.get_build_status(commit_id=commit_id)
 
+    def get_projects(
+        self,
+        start: int = 0,
+        limit: int = 25,
+    ) -> dict[str, Any]:
+        """List all Bitbucket Server projects."""
+        return self.client.get("/projects", {"start": start, "limit": limit})
+
+    def get_repositories(
+        self,
+        project_key: str,
+        start: int = 0,
+        limit: int = 25,
+    ) -> dict[str, Any]:
+        """List repositories in a project."""
+        return self.client.get(
+            f"/projects/{project_key}/repos",
+            {"start": start, "limit": limit},
+        )
+
     def close(self) -> None:
         """Close the client connection."""
         self.client.close()
