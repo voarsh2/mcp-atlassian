@@ -14,6 +14,7 @@ from fastmcp import Context
 from fastmcp.server.dependencies import get_access_token, get_http_request
 from starlette.requests import Request
 
+from mcp_atlassian.bitbucket_server import BitbucketServerConfig, BitbucketServerFetcher
 from mcp_atlassian.confluence import ConfluenceConfig, ConfluenceFetcher
 from mcp_atlassian.jira import JiraConfig, JiraFetcher
 from mcp_atlassian.servers.context import MainAppContext
@@ -704,3 +705,53 @@ async def get_confluence_fetcher(ctx: Context) -> ConfluenceFetcher:
         ValueError: If configuration or credentials are invalid.
     """
     return await _get_fetcher(ctx, _confluence_spec())
+
+
+def _bitbucket_on_validated(
+    fn_name: str,
+    request: Request,
+    validation_data: Any,
+    auth_branch: str,
+    user_email: str | None,
+) -> None:
+    """Post-validation logging for Bitbucket Server."""
+    logger.debug(
+        f"{fn_name}: Validated Bitbucket Server fetcher "
+        f"(auth_branch={auth_branch})"
+    )
+
+
+def _bitbucket_spec() -> _ServiceSpec:
+    """Build Bitbucket Server service spec.
+
+    Deferred to a function so test patches on ``BitbucketServerFetcher`` /
+    ``BitbucketServerConfig`` are picked up at call time.
+    """
+    return _ServiceSpec(
+        name="Bitbucket",
+        fetcher_class=BitbucketServerFetcher,
+        config_class=BitbucketServerConfig,
+        state_key="bitbucket_fetcher",
+        config_attr="full_bitbucket_config",
+        url_header="X-Atlassian-Bitbucket-Url",
+        token_header="X-Atlassian-Bitbucket-Personal-Token",  # noqa: S106
+        filter_kwargs={"projects_filter": None},
+        get_session=lambda f: f.client.session,
+        validate_fn=lambda f: f.client.config.url,
+        on_validated=_bitbucket_on_validated,
+    )
+
+
+async def get_bitbucket_fetcher(ctx: Context) -> BitbucketServerFetcher:
+    """Returns a BitbucketServerFetcher instance appropriate for the current request context.
+
+    Args:
+        ctx: The FastMCP context.
+
+    Returns:
+        BitbucketServerFetcher instance for the current user or global config.
+
+    Raises:
+        ValueError: If configuration or credentials are invalid.
+    """
+    return await _get_fetcher(ctx, _bitbucket_spec())

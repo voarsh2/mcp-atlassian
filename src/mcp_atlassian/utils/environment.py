@@ -176,4 +176,42 @@ def get_available_services(
             "Jira is not configured or required environment variables are missing."
         )
 
-    return {"confluence": confluence_is_setup, "jira": jira_is_setup}
+    # Bitbucket Server/Data Center
+    bitbucket_url = os.getenv("BITBUCKET_URL")
+    bitbucket_is_setup = False
+    if bitbucket_url:
+        bitbucket_is_setup = _check_service_auth(
+            service_name="Bitbucket Server",
+            service_url=bitbucket_url,
+            client_id_envs=("ATLASSIAN_OAUTH_CLIENT_ID", "BITBUCKET_OAUTH_CLIENT_ID"),
+            client_secret_envs=(
+                "ATLASSIAN_OAUTH_CLIENT_SECRET",
+                "BITBUCKET_OAUTH_CLIENT_SECRET",
+            ),
+            access_token_envs=(
+                "ATLASSIAN_OAUTH_ACCESS_TOKEN",
+                "BITBUCKET_OAUTH_ACCESS_TOKEN",
+            ),
+            username_env="BITBUCKET_USERNAME",
+            api_env="BITBUCKET_API_TOKEN",
+            pat_env="BITBUCKET_PERSONAL_TOKEN",
+        )
+
+    if not bitbucket_is_setup:
+        bitbucket_token = headers.get("X-Atlassian-Bitbucket-Personal-Token")
+        bitbucket_url_header = headers.get("X-Atlassian-Bitbucket-Url")
+
+        if bitbucket_token and bitbucket_url_header:
+            bitbucket_is_setup = True
+            logger.info("Using Bitbucket Server authentication from header personal token")
+
+    if not bitbucket_is_setup:
+        logger.info(
+            "Bitbucket Server is not configured or required environment variables are missing."
+        )
+
+    return {
+        "confluence": confluence_is_setup,
+        "jira": jira_is_setup,
+        "bitbucket": bitbucket_is_setup,
+    }

@@ -137,11 +137,47 @@ CONFLUENCE_TOOLSETS: dict[str, ToolsetDefinition] = {
     ),
 }
 
+# --- Bitbucket Server toolsets (5) ---
+
+BITBUCKET_TOOLSETS: dict[str, ToolsetDefinition] = {
+    "bitbucket_pull_requests": ToolsetDefinition(
+        name="bitbucket_pull_requests",
+        description="Pull request operations: get, comment, diff, reviews, activities",
+        default=True,
+    ),
+    "bitbucket_search": ToolsetDefinition(
+        name="bitbucket_search",
+        description="Code and repository search",
+        default=True,
+    ),
+    "bitbucket_files": ToolsetDefinition(
+        name="bitbucket_files",
+        description="File content retrieval",
+        default=True,
+    ),
+    "bitbucket_branches": ToolsetDefinition(
+        name="bitbucket_branches",
+        description="Branch listing and commit history",
+        default=True,
+    ),
+    "bitbucket_commits": ToolsetDefinition(
+        name="bitbucket_commits",
+        description="Commit details and changes",
+        default=True,
+    ),
+    "bitbucket_builds": ToolsetDefinition(
+        name="bitbucket_builds",
+        description="Build status for commits",
+        default=False,
+    ),
+}
+
 # --- Combined registry ---
 
 ALL_TOOLSETS: dict[str, ToolsetDefinition] = {
     **JIRA_TOOLSETS,
     **CONFLUENCE_TOOLSETS,
+    **BITBUCKET_TOOLSETS,
 }
 
 DEFAULT_TOOLSETS: set[str] = {
