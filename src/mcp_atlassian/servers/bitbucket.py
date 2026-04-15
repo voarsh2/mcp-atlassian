@@ -139,6 +139,42 @@ async def add_comment(
 
 
 @bitbucket_mcp.tool(
+    tags={"bitbucket", "write", "toolset:bitbucket_pull_requests"},
+    annotations={"title": "Decline Pull Request", "readOnlyHint": False},
+)
+@check_write_access
+async def decline_pull_request(
+    ctx: Context,
+    repository: Annotated[
+        str, Field(description="Repository slug (e.g., 'my-repo')")
+    ],
+    pr_id: Annotated[int, Field(description="Pull request ID")],
+    version: Annotated[
+        int,
+        Field(description="Current pull request version required by Bitbucket"),
+    ],
+    project: Annotated[
+        str | None,
+        Field(description="Project key (optional if BITBUCKET_PROJECTS_FILTER set)"),
+    ] = None,
+    comment: Annotated[
+        str | None,
+        Field(description="Optional comment to add when declining the pull request"),
+    ] = None,
+) -> str:
+    """Decline a pull request."""
+    bitbucket = await get_bitbucket_fetcher(ctx)
+    pr = bitbucket.decline_pull_request(
+        repository=repository,
+        pr_id=pr_id,
+        version=version,
+        project=project,
+        comment=comment,
+    )
+    return json.dumps(pr.to_simplified_dict(), indent=2)
+
+
+@bitbucket_mcp.tool(
     tags={"bitbucket", "read", "toolset:bitbucket_pull_requests"},
     annotations={"title": "Get Pull Request Diff", "readOnlyHint": True},
 )

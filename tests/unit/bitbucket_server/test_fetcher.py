@@ -70,6 +70,25 @@ def test_fetcher_get_pull_request(mock_fetcher):
     assert result is mock_pr
 
 
+def test_fetcher_decline_pull_request(mock_fetcher):
+    """Test fetcher delegates PR decline to pull_requests."""
+    mock_pr = MagicMock()
+    mock_fetcher.pull_requests.decline_pull_request.return_value = mock_pr
+
+    result = mock_fetcher.decline_pull_request(
+        "my-repo", 1, version=3, project="TESTPROJ", comment="Declining"
+    )
+
+    mock_fetcher.pull_requests.decline_pull_request.assert_called_once_with(
+        repository="my-repo",
+        pr_id=1,
+        version=3,
+        project="TESTPROJ",
+        comment="Declining",
+    )
+    assert result is mock_pr
+
+
 def test_fetcher_add_comment(mock_fetcher):
     """Test fetcher delegates to comments."""
     mock_comment = MagicMock()

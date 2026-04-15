@@ -68,6 +68,23 @@ class BitbucketServerFetcher:
             repository=repository, pr_id=pr_id, project=project
         )
 
+    def decline_pull_request(
+        self,
+        repository: str,
+        pr_id: int,
+        version: int,
+        project: str | None = None,
+        comment: str | None = None,
+    ) -> BitbucketServerPullRequest:
+        """Decline a pull request."""
+        return self.pull_requests.decline_pull_request(
+            repository=repository,
+            pr_id=pr_id,
+            version=version,
+            project=project,
+            comment=comment,
+        )
+
     def get_comments(
         self,
         repository: str,

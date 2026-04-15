@@ -82,6 +82,43 @@ class BitbucketServerPullRequests:
 
         return BitbucketServerPullRequest.from_api_response(response)
 
+    def decline_pull_request(
+        self,
+        repository: str,
+        pr_id: int,
+        version: int,
+        project: str | None = None,
+        comment: str | None = None,
+    ) -> BitbucketServerPullRequest:
+        """Decline a pull request.
+
+        Bitbucket Server/Data Center expects a POST to the decline endpoint with
+        the current pull request version. The version may be sent as a query
+        parameter or in the JSON body; this implementation sends it in both
+        places for compatibility with Server/DC deployments.
+
+        Args:
+            repository: Repository slug
+            pr_id: Pull request ID
+            version: Current pull request version
+            project: Project key (can be omitted if provided in config)
+            comment: Optional comment to add while declining the pull request
+
+        Returns:
+            Updated pull request details
+        """
+        project = project or self._resolve_project()
+
+        logger.debug(f"Declining pull request {pr_id} from {project}/{repository}")
+
+        path = f"/projects/{project}/repos/{repository}/pull-requests/{pr_id}/decline"
+        payload: dict[str, object] = {"version": version}
+        if comment:
+            payload["comment"] = comment
+
+        response = self.client.post(path, json=payload, params={"version": version})
+        return BitbucketServerPullRequest.from_api_response(response)
+
     def _resolve_project(self) -> str:
         """Resolve project from config or raise."""
         if self.client.config.projects_filter:

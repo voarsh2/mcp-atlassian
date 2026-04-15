@@ -84,3 +84,71 @@ def test_get_pull_request_missing_project():
 
         with pytest.raises(ValueError, match="Project parameter is required"):
             ops.get_pull_request("my-repo", 1)
+
+
+def test_decline_pull_request(pr_ops):
+    """Test decline_pull_request calls the correct endpoint and payload."""
+    mock_response = {
+        "id": 1,
+        "title": "Test PR",
+        "state": "DECLINED",
+        "version": 4,
+        "fromRef": {"id": "refs/heads/feature", "displayId": "feature"},
+        "toRef": {
+            "id": "refs/heads/main",
+            "displayId": "main",
+            "repository": {
+                "id": 1,
+                "slug": "my-repo",
+                "name": "My Repo",
+                "project": {"key": "TESTPROJ", "name": "Test"},
+            },
+        },
+        "author": {
+            "id": 1,
+            "name": "user1",
+            "displayName": "User One",
+            "emailAddress": "user@example.com",
+            "active": True,
+        },
+        "reviewers": [],
+    }
+    pr_ops.client.post = MagicMock(return_value=mock_response)
+
+    result = pr_ops.decline_pull_request(
+        "my-repo",
+        1,
+        version=3,
+        project="TESTPROJ",
+        comment="Closing this out",
+    )
+
+    pr_ops.client.post.assert_called_once_with(
+        "/projects/TESTPROJ/repos/my-repo/pull-requests/1/decline",
+        json={"version": 3, "comment": "Closing this out"},
+        params={"version": 3},
+    )
+    assert isinstance(result, BitbucketServerPullRequest)
+    assert result.state == "DECLINED"
+
+
+def test_decline_pull_request_uses_config_project(pr_ops):
+    """Test decline_pull_request uses project from config when not provided."""
+    mock_response = {
+        "id": 1,
+        "title": "PR",
+        "state": "DECLINED",
+        "fromRef": {},
+        "toRef": {"repository": {}},
+        "author": {},
+        "reviewers": [],
+    }
+    pr_ops.client.post = MagicMock(return_value=mock_response)
+
+    pr_ops.decline_pull_request("my-repo", 1, version=2)
+
+    pr_ops.client.post.assert_called_once_with(
+        "/projects/TESTPROJ/repos/my-repo/pull-requests/1/decline",
+        json={"version": 2},
+        params={"version": 2},
+    )

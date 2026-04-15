@@ -71,6 +71,24 @@ def test_post_request(mock_client):
     assert result == {"id": 123}
 
 
+def test_post_request_with_params(mock_client):
+    """Test POST request with query params."""
+    mock_response = MagicMock()
+    mock_response.json.return_value = {"id": 123}
+    mock_client.session.post.return_value = mock_response
+
+    mock_client.post(
+        "/projects/TEST/repos/my-repo/pull-requests/1/decline",
+        json={"version": 3},
+        params={"version": 3},
+    )
+
+    mock_client.session.post.assert_called_once()
+    call_kwargs = mock_client.session.post.call_args
+    assert call_kwargs[1]["params"] == {"version": 3}
+    assert call_kwargs[1]["json"] == {"version": 3}
+
+
 def test_post_url_request(mock_client):
     """Test POST to full URL."""
     mock_response = MagicMock()
